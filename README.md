@@ -1,7 +1,7 @@
 # instagram-scrape-followers
 
 python3 -m venv instagram-scrape-followers
-cd insta-scrape
+cd instagram-scrape-followers
 source bin/activate
 pip -r requirements.txt
 curl -L -O https://raw.githubusercontent.com/backroot/instagram-scrape-followers/master/config.ini.sample
