@@ -37,7 +37,7 @@ def main():
     p = config.get('account', 'password')
     password.send_keys(p)
     password.send_keys(Keys.RETURN)
-    time.sleep(3)
+    time.sleep(10)
 
     driver.get('https://www.instagram.com/' + username + '/')
     WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.CLASS_NAME, "Y8-fY")))
