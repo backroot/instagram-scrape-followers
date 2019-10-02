@@ -2,7 +2,11 @@
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 import bs4
 import pandas as pd
 import chromedriver_binary
@@ -21,7 +25,7 @@ def main():
     options.add_argument('--headless')
     driver = webdriver.Chrome(options=options)
     driver.get('https://www.instagram.com/accounts/login/?source=auth_switcher')
-    time.sleep(2)
+    WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.NAME, 'username')))
 
     # login
     config = configparser.ConfigParser()
@@ -36,10 +40,10 @@ def main():
     time.sleep(3)
 
     driver.get('https://www.instagram.com/' + username + '/')
-    time.sleep(3)
+    WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.CLASS_NAME, "Y8-fY")))
     follower_button = driver.find_elements_by_css_selector("li.Y8-fY")[1]
     follower_button.click()
-    time.sleep(3)
+    time.sleep(10)
 
     # You can get followers by scrolling the follower popup window.
     height = driver.execute_script("return document.querySelectorAll('div.isgrP')[0].scrollHeight;")
@@ -52,11 +56,13 @@ def main():
         height = driver.execute_script("return document.querySelectorAll('div.isgrP')[0].scrollHeight;")
         top = driver.execute_script("return document.querySelectorAll('div.isgrP')[0].scrollTop;")
         print("\rfollowers window scrolling... {0}/{1}".format(top, height), end='', flush=True)
+        if 110000 <= height:
+            break;
         if before_top == top:
-            print("")
             break;
         before_top = top
 
+    print("")
     page_url = driver.page_source
     soup = bs4.BeautifulSoup(page_url,"lxml")
     elm = soup.find_all("a", {"class": "FPmhX notranslate _0imsa"})
