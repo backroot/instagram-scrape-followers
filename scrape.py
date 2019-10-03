@@ -24,6 +24,7 @@ def main():
     options = Options()
     options.add_argument('--headless')
     driver = webdriver.Chrome(options=options)
+    driver.set_script_timeout(300)
     driver.get('https://www.instagram.com/accounts/login/?source=auth_switcher')
     WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.NAME, 'username')))
 
@@ -37,7 +38,7 @@ def main():
     p = config.get('account', 'password')
     password.send_keys(p)
     password.send_keys(Keys.RETURN)
-    time.sleep(10)
+    time.sleep(3)
 
     driver.get('https://www.instagram.com/' + username + '/')
     WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.CLASS_NAME, "Y8-fY")))
@@ -51,16 +52,18 @@ def main():
     before_top = 0
     while True:
         i += 100
-        driver.execute_script("document.querySelectorAll('div.isgrP')[0].scrollTo(0, " + str(i) + ");")
-        time.sleep(0.5)
-        height = driver.execute_script("return document.querySelectorAll('div.isgrP')[0].scrollHeight;")
-        top = driver.execute_script("return document.querySelectorAll('div.isgrP')[0].scrollTop;")
-        print("\rfollowers window scrolling... {0}/{1}".format(top, height), end='', flush=True)
-        if 110000 <= height:
-            break;
-        if before_top == top:
-            break;
-        before_top = top
+        try: 
+            driver.execute_script("document.querySelectorAll('div.isgrP')[0].scrollTo(0, " + str(i) + ");")
+            time.sleep(0.5)
+            height = driver.execute_script("return document.querySelectorAll('div.isgrP')[0].scrollHeight;")
+            top = driver.execute_script("return document.querySelectorAll('div.isgrP')[0].scrollTop;")
+            print("\rfollowers window scrolling... {0}/{1}".format(top, height), end='', flush=True)
+            if before_top == top:
+                break
+            before_top = top
+        except TimeoutException as ex:
+            print("Exception has been thrown. " + str(ex))
+            break
 
     print("")
     page_url = driver.page_source
